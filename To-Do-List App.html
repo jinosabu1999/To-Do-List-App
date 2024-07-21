@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futuristic Tasks</title>
+    <style>
+        :root {
+            --primary-color: #8a4baf;
+            --secondary-color: #6a5acd;
+            --text-color: #ffffff;
+            --icon-color: #ffffff;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            color: var(--text-color);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .input-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 10px 0 0 10px;
+            color: var(--text-color);
+            font-size: 16px;
+        }
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .add-btn {
+            background-color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 0 10px 10px 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .add-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: rgba(255, 255, 255, 0.1);
+            margin-bottom: 10px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .task-text {
+            flex-grow: 1;
+            color: var(--text-color);
+            margin-left: 10px;
+            font-size: 16px;
+        }
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 5px;
+        }
+        .action-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .checkbox.checked {
+            background-color: var(--text-color);
+        }
+        .checkbox svg {
+            display: none;
+        }
+        .checkbox.checked svg {
+            display: block;
+            width: 16px;
+            height: 16px;
+        }
+        .empty-state {
+            text-align: center;
+            color: var(--text-color);
+            font-style: italic;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Futuristic Tasks</h1>
+        <div class="input-container">
+            <input type="text" id="taskInput" placeholder="Add a new task">
+            <button class="add-btn" onclick="addTask()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </button>
+        </div>
+        <ul id="taskList"></ul>
+        <div id="emptyState" class="empty-state">No tasks yet. Add one to get started!</div>
+    </div>
+
+    <script>
+        const taskList = document.getElementById('taskList');
+        const emptyState = document.getElementById('emptyState');
+
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            if (input.value.trim() !== '') {
+                const li = createTaskElement(input.value);
+                taskList.appendChild(li);
+                input.value = '';
+                updateEmptyState();
+                saveTasks();
+            }
+        }
+
+        function createTaskElement(text, completed = false) {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <div class="checkbox${completed ? ' checked' : ''}" onclick="toggleTask(this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <span class="task-text" style="text-decoration: ${completed ? 'line-through' : 'none'}; opacity: ${completed ? '0.6' : '1'}">${text}</span>
+                <button class="action-btn edit-btn" onclick="editTask(this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--icon-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                </button>
+                <button class="action-btn delete-btn" onclick="deleteTask(this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--icon-color)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                </button>
+            `;
+            return li;
+        }
+
+        function toggleTask(checkbox) {
+            checkbox.classList.toggle('checked');
+            const taskText = checkbox.nextElementSibling;
+            taskText.style.textDecoration = checkbox.classList.contains('checked') ? 'line-through' : 'none';
+            taskText.style.opacity = checkbox.classList.contains('checked') ? '0.6' : '1';
+            saveTasks();
+        }
+
+        function editTask(button) {
+            const taskText = button.previousElementSibling;
+            const newText = prompt('Edit task:', taskText.textContent);
+            if (newText !== null && newText.trim() !== '') {
+                taskText.textContent = newText;
+                saveTasks();
+            }
+        }
+
+        function deleteTask(button) {
+            button.closest('li').remove();
+            updateEmptyState();
+            saveTasks();
+        }
+
+        function updateEmptyState() {
+            emptyState.style.display = taskList.children.length === 0 ? 'block' : 'none';
+        }
+
+        function saveTasks() {
+            const tasks = Array.from(taskList.children).map(li => ({
+                text: li.querySelector('.task-text').textContent,
+                completed: li.querySelector('.checkbox').classList.contains('checked')
+            }));
+            localStorage.setItem('futuristicTasks', JSON.stringify(tasks));
+        }
+
+        function loadTasks() {
+            const tasks = JSON.parse(localStorage.getItem('futuristicTasks')) || [];
+            tasks.forEach(task => {
+                const li = createTaskElement(task.text, task.completed);
+                taskList.appendChild(li);
+            });
+            updateEmptyState();
+        }
+
+        document.addEventListener('DOMContentLoaded', loadTasks);
+
+        document.getElementById('taskInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+    </script>
+</body>
+</html>
