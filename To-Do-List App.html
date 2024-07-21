@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Futuristic Tasks</title>
+    <title>To-Do-List App</title>
     <style>
         :root {
             --primary-color: #8a4baf;
             --secondary-color: #6a5acd;
             --text-color: #ffffff;
-            --icon-color: #ffffff;
+            --icon-color: #8a4baf;
+            --accent-color: #ff6b6b;
+            --background-color: #f0f4f8;
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -19,19 +21,18 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            background: var(--background-color);
         }
         .container {
-            background-color: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
+            background-color: white;
             border-radius: 20px;
             padding: 30px;
             width: 90%;
             max-width: 400px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
         h1 {
-            color: var(--text-color);
+            color: var(--primary-color);
             text-align: center;
             margin-bottom: 30px;
             font-size: 28px;
@@ -44,17 +45,16 @@
         input {
             flex-grow: 1;
             padding: 12px 15px;
-            border: none;
-            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid #e0e0e0;
             border-radius: 10px 0 0 10px;
-            color: var(--text-color);
+            color: #333;
             font-size: 16px;
         }
         input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
+            color: #aaa;
         }
         .add-btn {
-            background-color: white;
+            background-color: var(--primary-color);
             border: none;
             padding: 12px 15px;
             border-radius: 0 10px 10px 0;
@@ -62,6 +62,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: background-color 0.3s ease;
+        }
+        .add-btn:hover {
+            background-color: var(--secondary-color);
         }
         .add-btn svg {
             width: 24px;
@@ -72,18 +76,27 @@
             padding: 0;
         }
         li {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: #f9f9f9;
             margin-bottom: 10px;
             padding: 12px 15px;
             border-radius: 10px;
             display: flex;
             align-items: center;
+            transition: all 0.3s ease;
+        }
+        li.completed {
+            background-color: #f0f0f0;
         }
         .task-text {
             flex-grow: 1;
-            color: var(--text-color);
+            color: #333;
             margin-left: 10px;
             font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .completed .task-text {
+            text-decoration: line-through;
+            opacity: 0.6;
         }
         .action-btn {
             background: none;
@@ -94,6 +107,10 @@
             align-items: center;
             justify-content: center;
             margin-left: 5px;
+            transition: all 0.3s ease;
+        }
+        .action-btn:hover {
+            transform: scale(1.1);
         }
         .action-btn svg {
             width: 20px;
@@ -103,14 +120,15 @@
             width: 24px;
             height: 24px;
             border-radius: 50%;
-            border: 2px solid var(--text-color);
+            border: 2px solid var(--primary-color);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
         .checkbox.checked {
-            background-color: var(--text-color);
+            background-color: var(--primary-color);
         }
         .checkbox svg {
             display: none;
@@ -122,31 +140,91 @@
         }
         .empty-state {
             text-align: center;
-            color: var(--text-color);
+            color: #888;
             font-style: italic;
             opacity: 0.7;
+        }
+        .filters {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            padding: 5px;
+        }
+        .filter-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        .filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .clear-completed {
+            background-color: var(--accent-color);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .clear-completed:hover {
+            background-color: #ff8787;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        .task-count {
+            color: #666;
+            font-size: 14px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        li {
+            animation: fadeIn 0.3s ease;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Futuristic Tasks</h1>
+        <h1>To-Do-List App</h1>
         <div class="input-container">
             <input type="text" id="taskInput" placeholder="Add a new task">
             <button class="add-btn" onclick="addTask()">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
             </button>
         </div>
+        <div class="filters">
+            <button class="filter-btn active" onclick="filterTasks('all')">All</button>
+            <button class="filter-btn" onclick="filterTasks('active')">Active</button>
+            <button class="filter-btn" onclick="filterTasks('completed')">Completed</button>
+        </div>
         <ul id="taskList"></ul>
         <div id="emptyState" class="empty-state">No tasks yet. Add one to get started!</div>
+        <button class="clear-completed" onclick="clearCompleted()">Clear Completed</button>
+        <div class="task-count" id="taskCount"></div>
     </div>
 
     <script>
         const taskList = document.getElementById('taskList');
         const emptyState = document.getElementById('emptyState');
+        const taskCount = document.getElementById('taskCount');
+        let currentFilter = 'all';
 
         function addTask() {
             const input = document.getElementById('taskInput');
@@ -156,18 +234,21 @@
                 input.value = '';
                 updateEmptyState();
                 saveTasks();
+                updateTaskCount();
+                applyFilter();
             }
         }
 
         function createTaskElement(text, completed = false) {
             const li = document.createElement('li');
+            li.className = completed ? 'completed' : '';
             li.innerHTML = `
                 <div class="checkbox${completed ? ' checked' : ''}" onclick="toggleTask(this)">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                 </div>
-                <span class="task-text" style="text-decoration: ${completed ? 'line-through' : 'none'}; opacity: ${completed ? '0.6' : '1'}">${text}</span>
+                <span class="task-text">${text}</span>
                 <button class="action-btn edit-btn" onclick="editTask(this)">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--icon-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -175,7 +256,7 @@
                     </svg>
                 </button>
                 <button class="action-btn delete-btn" onclick="deleteTask(this)">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--icon-color)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--icon-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="3 6 5 6 21 6"></polyline>
                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                     </svg>
@@ -185,15 +266,17 @@
         }
 
         function toggleTask(checkbox) {
+            const li = checkbox.closest('li');
+            li.classList.toggle('completed');
             checkbox.classList.toggle('checked');
-            const taskText = checkbox.nextElementSibling;
-            taskText.style.textDecoration = checkbox.classList.contains('checked') ? 'line-through' : 'none';
-            taskText.style.opacity = checkbox.classList.contains('checked') ? '0.6' : '1';
             saveTasks();
+            updateTaskCount();
+            applyFilter();
         }
 
         function editTask(button) {
-            const taskText = button.previousElementSibling;
+            const li = button.closest('li');
+            const taskText = li.querySelector('.task-text');
             const newText = prompt('Edit task:', taskText.textContent);
             if (newText !== null && newText.trim() !== '') {
                 taskText.textContent = newText;
@@ -205,6 +288,8 @@
             button.closest('li').remove();
             updateEmptyState();
             saveTasks();
+            updateTaskCount();
+            applyFilter();
         }
 
         function updateEmptyState() {
@@ -214,7 +299,7 @@
         function saveTasks() {
             const tasks = Array.from(taskList.children).map(li => ({
                 text: li.querySelector('.task-text').textContent,
-                completed: li.querySelector('.checkbox').classList.contains('checked')
+                completed: li.classList.contains('completed')
             }));
             localStorage.setItem('futuristicTasks', JSON.stringify(tasks));
         }
@@ -226,6 +311,50 @@
                 taskList.appendChild(li);
             });
             updateEmptyState();
+            updateTaskCount();
+            applyFilter();
+        }
+
+        function filterTasks(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.filter-btn:nth-child(${['all', 'active', 'completed'].indexOf(filter) + 1})`).classList.add('active');
+            applyFilter();
+        }
+
+        function applyFilter() {
+            Array.from(taskList.children).forEach(li => {
+                switch (currentFilter) {
+                    case 'all':
+                        li.style.display = '';
+                        break;
+                    case 'active':
+                        li.style.display = li.classList.contains('completed') ? 'none' : '';
+                        break;
+                    case 'completed':
+                        li.style.display = li.classList.contains('completed') ? '' : 'none';
+                        break;
+                }
+            });
+        }
+
+        function clearCompleted() {
+            Array.from(taskList.children).forEach(li => {
+                if (li.classList.contains('completed')) {
+                    li.remove();
+                }
+            });
+            updateEmptyState();
+            saveTasks();
+            updateTaskCount();
+            applyFilter();
+        }
+
+        function updateTaskCount() {
+            const total = taskList.children.length;
+            const completed = Array.from(taskList.children).filter(li => li.classList.contains('completed')).length;
+            const active = total - completed;
+            taskCount.textContent = `${active} active, ${completed} completed`;
         }
 
         document.addEventListener('DOMContentLoaded', loadTasks);
